@@ -16,4 +16,5 @@ exports.addAuth = https.onCall(auth.add)
 exports.editAuth = https.onCall(auth.edit)
 exports.deleteAuth = https.onCall(auth.remove)
 
-exports.getBatteryList = https.onCall(battery.list)
+exports.getBatteryLogs = https.onCall(battery.logs)
+exports.getDistanceTraveled = https.onCall(battery.getDistanceTraveled)

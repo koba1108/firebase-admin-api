@@ -1,19 +1,29 @@
+const moment = require('moment')
 const { client } = require('../bigquery')
+const { battery } = require('../bigquery/query')
 
-// クエリキャッシュについて
-// https://cloud.google.com/bigquery/docs/cached-results?hl=ja
-// クエリのパラメータ化
-// https://cloud.google.com/bigquery/docs/parameterized-queries?hl=ja
+const logs = async ({ unit, from, to }, context) => {
+  if(!context.auth) return []
+  if(battery.hasOwnProperty(unit)) {
+    const fromTimestamp = moment(from).startOf('day').format('YYYY-MM-DD HH:mm:ss')
+    const toTimestamp = moment(to).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+    const query = battery[unit](fromTimestamp, toTimestamp)
+    const [rows] = await client.query(query)
+    return rows
+  }
+  return []
+}
 
-const list = async (data, context) => {
-  console.log('data', data)
-  console.log('context.auth', context.auth)
-  if(!context.auth) return
-  const sql = `SELECT * FROM \`maas_mumbai.battery\` LIMIT 1000`
-  const [rows] = await client.query(sql)
+const getDistanceTraveled = async ({ from, to }, context) => {
+  if(!context.auth) return []
+  const fromTimestamp = moment(from).startOf('day').format('YYYY-MM-DD HH:mm:ss')
+  const toTimestamp = moment(to).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+  const query = battery.diffTdt(fromTimestamp, toTimestamp)
+  const [rows] = await client.query(query)
   return rows
 }
 
 module.exports = {
-  list,
+  logs,
+  getDistanceTraveled,
 }
