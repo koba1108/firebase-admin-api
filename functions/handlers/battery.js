@@ -1,12 +1,14 @@
-const moment = require('moment')
+const moment = require('../plugins/moment')
 const { client } = require('../bigquery')
 const { battery } = require('../bigquery/query')
 
 const logs = async ({ unit, from, to }, context) => {
   if(!context.auth) return []
   if(battery.hasOwnProperty(unit)) {
-    const fromTimestamp = moment(from).startOf('day').format('YYYY-MM-DD HH:mm:ss')
-    const toTimestamp = moment(to).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+    const fromTimestamp = moment(from).startOf('day').toISOString(true)
+    const toTimestamp = moment(to).endOf('day').toISOString(true)
+    console.log('fromTimestamp', fromTimestamp)
+    console.log('toTimestamp', toTimestamp)
     const query = battery[unit](fromTimestamp, toTimestamp)
     const [rows] = await client.query(query)
     return rows
@@ -16,8 +18,10 @@ const logs = async ({ unit, from, to }, context) => {
 
 const getDistanceTraveled = async ({ from, to }, context) => {
   if(!context.auth) return []
-  const fromTimestamp = moment(from).startOf('day').format('YYYY-MM-DD HH:mm:ss')
-  const toTimestamp = moment(to).endOf('day').format('YYYY-MM-DD HH:mm:ss')
+  const fromTimestamp = moment(from).startOf('day').toISOString(true)
+  const toTimestamp = moment(to).endOf('day').toISOString(true)
+  console.log('fromTimestamp', fromTimestamp)
+  console.log('toTimestamp', toTimestamp)
   const query = battery.diffTdt(fromTimestamp, toTimestamp)
   const [rows] = await client.query(query)
   return rows

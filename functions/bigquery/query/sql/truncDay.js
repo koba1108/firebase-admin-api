@@ -2,6 +2,7 @@ module.exports = `
 SELECT
   TID,
   truncCreatedAt as TIME, -- FORMAT("%t", truncCreatedAt) as TIME,
+  -- FORMAT_TIMESTAMP('%Y-%m-%d %H:%M:%S %Z', truncCreatedAt, 'Asia/Kolkata') as TIME,
   -- TDT,
   -- LAG (TDT, 1) OVER (ORDER BY TID, CreatedAt, RANK) as LAG_TDT,
   -- ROUND(TDT - LAG (TDT, 1) OVER (PARTITION BY TID ORDER BY TID, CreatedAt, RANK), 3) as LAG_TDT_DIFF,
@@ -31,6 +32,7 @@ FROM (
       TID != ""
       AND CreatedAt BETWEEN @from and @to
     )
+    WHERE truncCreatedAt BETWEEN @from and @to
   )
 WHERE
   RANK = 1
